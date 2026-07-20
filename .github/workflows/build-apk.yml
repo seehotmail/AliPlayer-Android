@@ -3,28 +3,19 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: androidsdk/android-31:latest
     defaults:
       run:
         working-directory: API-Example
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-java@v4
-        with:
-          java-version: '11'
-          distribution: 'temurin'
       - name: Fix Gradle mirror
         run: sed -i "s|http://mtl-gradle-mirror.oss-cn-hangzhou.aliyuncs.com/gradle-7.0.2-bin.zip|https://services.gradle.org/distributions/gradle-7.0.2-bin.zip|g" gradle/wrapper/gradle-wrapper.properties
-      - name: Install Android SDK via apt
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y -qq android-sdk 2>&1 | tail -3
-          export ANDROID_HOME=/usr/lib/android-sdk
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          ls $ANDROID_HOME/platforms/ 2>/dev/null || echo "No platforms, installing..."
-          yes | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-31" "build-tools;30.0.3" 2>&1 || true
       - name: Build APK
         run: |
-          echo "sdk.dir=/usr/lib/android-sdk" > local.properties
+          java -version
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
       - uses: actions/upload-artifact@v4

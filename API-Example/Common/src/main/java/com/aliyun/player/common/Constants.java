@@ -102,10 +102,10 @@ public final class Constants {
         // PLAY auth of the sample video file
         public static final String SAMPLE_PLAY_AUTH = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6ImFwcC0xMDAwMDAwIiwidmlkZW9JZCI6IjAwNGZjOTBmZDcxZDcxZjBiZjE4NDUzMTk1OGMwNDAyIiwiY3VycmVudFRpbWVTdGFtcCI6MTc2NjEzMTE5MTYxMywiZXhwaXJlVGltZVN0YW1wIjoxOTIzODExMTkxNjEzLCJyZWdpb25JZCI6ImNuLXNoYW5naGFpIiwicGxheUNvbnRlbnRJbmZvIjp7ImZvcm1hdHMiOiJtM3U4Iiwic3RyZWFtVHlwZSI6InZpZGVvIiwiYXV0aFRpbWVvdXQiOjE4MDB9fQ.CjqZA-6okJb2PxOZr0Jjai9gWwvaNdG-bk3LWBMzhdc";
         // URL of the sample video file
-        public static final String SAMPLE_VIDEO_URL = "https://alivc-demo-vod.aliyuncs.com/6b357371ef3c45f4a06e2536fd534380/53733986bce75cfc367d7554a47638c0-fd.mp4";
+        public static final String SAMPLE_VIDEO_URL = "https://www.w3schools.com/html/mov_bbb.mp4";
 
         // URL of the sample subtitle vtt video file
-        public static final String SAMPLE_VTT_SUBTITLE_VIDEO_URL = "https://alivc-demo-cms.alicdn.com/versionProduct/resources/API-Example/vtt/1406ff70-199609dae70.mp4";
+        public static final String SAMPLE_VTT_SUBTITLE_VIDEO_URL = "https://www.w3schools.com/html/mov_bbb.mp4";
 
         // URL of the sample livestream video file
         // FIXME 请填写直播流地址，否则会影响相关功能

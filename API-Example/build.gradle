@@ -5,6 +5,7 @@ buildscript {
         mavenCentral()
         // aliyun maven
         maven { url "https://maven.aliyun.com/repository/releases" }
+        mavenCentral()
     }
     dependencies {
         classpath "com.android.tools.build:gradle:4.1.2"
@@ -19,6 +20,7 @@ allprojects {
         mavenCentral()
         // aliyun maven
         maven { url "https://maven.aliyun.com/repository/releases" }
+        mavenCentral()
     }
 }
 

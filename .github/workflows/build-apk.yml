@@ -14,20 +14,15 @@ jobs:
           distribution: 'temurin'
       - name: Fix Gradle mirror
         run: sed -i "s|http://mtl-gradle-mirror.oss-cn-hangzhou.aliyuncs.com/gradle-7.0.2-bin.zip|https://services.gradle.org/distributions/gradle-7.0.2-bin.zip|g" gradle/wrapper/gradle-wrapper.properties
-      - name: Install Android SDK
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+      - name: Accept licenses & platforms
         run: |
-          export SDK=$HOME/android-sdk
-          mkdir -p $SDK; cd $SDK
-          curl -sLo ct.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-          unzip -q ct.zip
-          mkdir -p latest 2>/dev/null; mv cmdline-tools/* latest/ 2>/dev/null || true
-          export PATH=$SDK/latest/bin:$PATH
-          yes | sdkmanager --sdk_root=$SDK "platforms;android-31" "build-tools;30.0.3"
-          echo "SDK=$SDK" >> $GITHUB_ENV
-          echo "$SDK/latest/bin" >> $GITHUB_PATH
+          yes | $ANDROID_HOME/tools/bin/sdkmanager "platforms;android-31" "build-tools;30.0.3" 2>&1 || true
+          ls $ANDROID_HOME/platforms/ 2>/dev/null || echo "No platforms dir"
       - name: Build APK
         run: |
-          echo "sdk.dir=$SDK" > local.properties
+          echo "sdk.dir=$ANDROID_HOME" > local.properties
           chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace
       - uses: actions/upload-artifact@v4

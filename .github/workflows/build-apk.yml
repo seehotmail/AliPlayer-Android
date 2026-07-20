@@ -27,24 +27,35 @@ jobs:
           export ANDROID_SDK_ROOT=$HOME/android-sdk
           mkdir -p $ANDROID_SDK_ROOT
           cd $ANDROID_SDK_ROOT
+          echo "=== Downloading cmdline-tools ==="
           curl -sLo cmdline-tools.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
+          echo "=== Extracting ==="
           unzip -q cmdline-tools.zip
-          mkdir -p cmdline-tools/latest
-          mv cmdline-tools/* cmdline-tools/latest/ 2>/dev/null || true
-          # Fix: move everything properly
-          rm -rf latest 2>/dev/null
-          mkdir -p latest
-          mv cmdline-tools/* latest/ 2>/dev/null || true
-          ls -la
-          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
-          yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-31" "build-tools;30.0.3"
+          echo "=== Structure ==="
+          find . -maxdepth 3 -type d | head -20
+          echo "=== Setting up ==="
+          export PATH=$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH 2>/dev/null || true
+          if [ -d "cmdline-tools" ]; then
+            mkdir -p latest
+            mv cmdline-tools/* latest/ 2>/dev/null || true
+            export PATH=$ANDROID_SDK_ROOT/latest/bin:$PATH
+          fi
+          which sdkmanager 2>/dev/null && echo "sdkmanager found" || echo "sdkmanager NOT found"
           echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT" >> $GITHUB_ENV
-          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
+
+      - name: Install SDK platforms
+        if: always()
+        run: |
+          export ANDROID_SDK_ROOT=$HOME/android-sdk
+          export PATH=$ANDROID_SDK_ROOT/latest/bin:$ANDROID_SDK_ROOT/cmdline-tools/latest/bin:$PATH
+          echo "=== Installing platforms ==="
+          yes | sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platforms;android-31" "build-tools;30.0.3" 2>&1 || echo "SDKMANAGER FAILED"
 
       - name: Build APK
+        if: always()
         run: |
-          chmod +x gradlew
           export ANDROID_SDK_ROOT=$HOME/android-sdk
+          chmod +x gradlew
           ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tail -80
 
       - name: Upload APK

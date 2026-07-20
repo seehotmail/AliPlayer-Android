@@ -20,21 +20,23 @@ jobs:
 
       - name: Install Android SDK
         run: |
-          mkdir -p $HOME/android-sdk/cmdline-tools
-          cd $HOME/android-sdk/cmdline-tools
+          export ANDROID_HOME=$HOME/android-sdk
+          mkdir -p $ANDROID_HOME/cmdline-tools
+          cd $ANDROID_HOME/cmdline-tools
           curl -sL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o tools.zip
           unzip -q tools.zip
-          mv cmdline-tools latest
-          export ANDROID_HOME=$HOME/android-sdk
+          mv cmdline-tools latest 2>/dev/null || true
           export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          yes | sdkmanager --sdk_root=$ANDROID_HOME "platforms;android-30" "build-tools;30.0.3" > /dev/null
+          yes | sdkmanager --sdk_root=$ANDROID_HOME "platforms;android-31" "build-tools;30.0.3" > /dev/null 2>&1
           echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
           echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
 
       - name: Build APK
         run: |
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon
+          export ANDROID_HOME=$HOME/android-sdk
+          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
+          ./gradlew assembleDebug --no-daemon --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

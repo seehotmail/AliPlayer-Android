@@ -12,7 +12,7 @@ import com.aliyun.player.bean.ErrorInfo;
 import com.aliyun.player.common.Constants;
 import com.aliyun.player.common.utils.ToastUtils;
 import com.aliyun.player.nativeclass.PlayerScene;
-import com.aliyun.player.source.VidAuth;
+import com.aliyun.player.source.UrlSource;
 import com.aliyun.player.videoview.AliDisplayView;
 
 /**
@@ -136,10 +136,9 @@ public class BasicPlaybackActivity extends AppCompatActivity {
      */
     private void startPlayback() {
         // Step 2: 创建播放源对象并设置播放地址
-        VidAuth vidAuth = new VidAuth();
-        vidAuth.setVid(Constants.DataSource.SAMPLE_VID);
-        vidAuth.setPlayAuth(Constants.DataSource.SAMPLE_PLAY_AUTH);
-        mAliPlayer.setDataSource(vidAuth);
+        UrlSource urlSource = new UrlSource();
+        urlSource.setUri(Constants.DataSource.SAMPLE_VIDEO_URL);
+        mAliPlayer.setDataSource(urlSource);
 
         // Step 3: 准备播放
         mAliPlayer.prepare();

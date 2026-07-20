@@ -3,23 +3,34 @@ on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: androidsdk/android-31:latest
     defaults:
       run:
         working-directory: API-Example
     steps:
       - uses: actions/checkout@v4
-      - name: Fix Gradle mirror
-        run: sed -i "s|http://mtl-gradle-mirror.oss-cn-hangzhou.aliyuncs.com/gradle-7.0.2-bin.zip|https://services.gradle.org/distributions/gradle-7.0.2-bin.zip|g" gradle/wrapper/gradle-wrapper.properties
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '11'
+          distribution: 'temurin'
+      - name: Install Android SDK
+        run: |
+          sudo apt-get update -qq && sudo apt-get install -y -qq android-sdk 2>&1 | tail -3
+          echo "ANDROID_HOME=/usr/lib/android-sdk" >> $GITHUB_ENV
+      - name: Fix Gradle
+        run: |
+          sed -i "s|http://mtl-gradle-mirror.oss-cn-hangzhou.aliyuncs.com/gradle-7.0.2-bin.zip|https://services.gradle.org/distributions/gradle-7.0.2-bin.zip|g" gradle/wrapper/gradle-wrapper.properties
+          echo "sdk.dir=/usr/lib/android-sdk" > local.properties
       - name: Build APK
         run: |
-          java -version
-          echo "sdk.dir=$ANDROID_HOME" > local.properties
           chmod +x gradlew
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: AliPlayer-APK
           path: API-Example/*/build/outputs/apk/debug/*.apk
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: build-logs
+          path: API-Example/*/build/reports/

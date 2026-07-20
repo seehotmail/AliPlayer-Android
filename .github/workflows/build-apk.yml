@@ -14,15 +14,19 @@ jobs:
           distribution: 'temurin'
       - name: Fix Gradle mirror
         run: sed -i "s|http://mtl-gradle-mirror.oss-cn-hangzhou.aliyuncs.com/gradle-7.0.2-bin.zip|https://services.gradle.org/distributions/gradle-7.0.2-bin.zip|g" gradle/wrapper/gradle-wrapper.properties
-      - name: Install Android SDK
+      - name: Install Android SDK + platforms
         run: |
           export SDK=$HOME/android-sdk
           mkdir -p $SDK; cd $SDK
           curl -sLo ct.zip https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
           unzip -q ct.zip; mkdir -p latest 2>/dev/null; mv cmdline-tools/* latest/ 2>/dev/null || true
           echo "SDK=$SDK" >> $GITHUB_ENV; echo "$SDK/latest/bin" >> $GITHUB_PATH
-      - name: Install SDK platforms
-        run: yes | sdkmanager --sdk_root=$SDK "platforms;android-31" "build-tools;30.0.3"
+          for i in 1 2 3; do
+            echo "=== SDK install attempt $i ==="
+            yes | sdkmanager --sdk_root=$SDK "platforms;android-31" "build-tools;30.0.3" && break
+            sleep 5
+          done
+          ls $SDK/platforms/
       - name: Build APK
         run: |
           echo "sdk.dir=$SDK" > local.properties

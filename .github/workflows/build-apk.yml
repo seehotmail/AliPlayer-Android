@@ -63,4 +63,4 @@ jobs:
         if: always()
         with:
           name: AliPlayer-APK
-          path: API-Example/*/build/outputs/apk/debug/*.apk
+          path: */build/outputs/apk/debug/*.apk

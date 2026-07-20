@@ -18,28 +18,25 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
-      - name: Install Android SDK
+      - name: Fix gradle wrapper URL (mirror may block)
         run: |
-          export ANDROID_HOME=$HOME/android-sdk
-          mkdir -p $ANDROID_HOME/cmdline-tools
-          cd $ANDROID_HOME/cmdline-tools
-          curl -sL https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -o tools.zip
-          unzip -q tools.zip
-          mv cmdline-tools latest 2>/dev/null || true
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          yes | sdkmanager --sdk_root=$ANDROID_HOME "platforms;android-31" "build-tools;30.0.3" > /dev/null 2>&1
-          echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          # The Chinese Gradle mirror may not be accessible from GitHub Actions
+          sed -i "s|http://mtl-gradle-mirror.oss-cn-hangzhou.aliyuncs.com/gradle-7.0.2-bin.zip|https://services.gradle.org/distributions/gradle-7.0.2-bin.zip|g" gradle/wrapper/gradle-wrapper.properties
+          cat gradle/wrapper/gradle-wrapper.properties
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          cmdline-tools-version: 11076708
 
       - name: Build APK
         run: |
           chmod +x gradlew
-          export ANDROID_HOME=$HOME/android-sdk
-          export PATH=$ANDROID_HOME/cmdline-tools/latest/bin:$PATH
-          ./gradlew assembleDebug --no-daemon --stacktrace
+          ./gradlew assembleDebug --no-daemon --stacktrace 2>&1 | tail -100
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: AliPlayer-APK
           path: API-Example/*/build/outputs/apk/debug/*.apk
